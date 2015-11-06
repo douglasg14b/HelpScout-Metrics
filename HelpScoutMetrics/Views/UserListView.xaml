@@ -1,0 +1,232 @@
+﻿<UserControl x:Class="HelpScoutMetrics.Views.UserListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:WPFControls="clr-namespace:WpfControls"
+             xmlns:behaviors="clr-namespace:WPFTextBoxAutoComplete"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             mc:Ignorable="d"
+             d:DesignHeight="385"
+             d:DesignWidth="572"
+             DataContext="{StaticResource UserListViewModel}"
+             Margin="0,25,0,0">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel x:Name="test">
+        <DockPanel DockPanel.Dock="Bottom"
+                   Margin="0,5">
+            <Button HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="5"
+                    Command="{WPFControls:BindTo ResetUserList()}">
+                Reset
+            </Button>
+            <Button VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Margin="5"
+                    DockPanel.Dock="Right"
+                    Command="{WPFControls:BindTo SaveUserList()}">
+                Save And Close
+            </Button>
+            <Button HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="5"
+                    DockPanel.Dock="Right"
+                    Command="{WPFControls:BindTo CloseFlyout()}">
+                Close And Cancel
+            </Button>
+        </DockPanel>
+
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.8*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.RowSpan="2"
+                       Margin="5">
+                <StackPanel Orientation="Horizontal"
+                            DockPanel.Dock="Top">
+                    <TextBlock FontSize="14"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Text="{Binding HelpScoutUserListStatus, UpdateSourceTrigger=PropertyChanged}"
+                               Foreground="{Binding HelpScoutUserListStatusColor, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel>
+                    <StackPanel DockPanel.Dock="Top"
+                                Margin="5"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Top">
+                        <TextBox x:Name="NewUserTextBox"
+                                 Controls:TextBoxHelper.Watermark="First &amp; Last Name"
+                                 behaviors:AutoCompleteBehavior.AutoCompleteItemsSource="{Binding HelpScoutUsersListStrings}"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 MinWidth="125"
+                                 Text="{Binding NewUserName, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="{WPFControls:BindTo AddUser()}"
+                                            Key="Enter" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                        <Button Margin="5"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Command="{WPFControls:BindTo AddUser()}">
+                            Add User
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="5"
+                                VerticalAlignment="Top">
+                        <TextBox AcceptsReturn="True"
+                                 Controls:TextBoxHelper.Watermark="Paste a List of Names"
+                                 Margin="0,5,0,0"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Top"
+                                 Text="{Binding NewUserNames, UpdateSourceTrigger=PropertyChanged}"
+                                 MaxWidth="150"
+                                 MinWidth="129">
+                            
+                        </TextBox>
+                        <Button HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Margin="5"
+                                Command="{WPFControls:BindTo AddUsers()}">
+                            Add Users
+                        </Button>
+                    </StackPanel>
+
+                </StackPanel>
+
+            </DockPanel>
+            <StackPanel Grid.RowSpan="2"
+                       Margin="5"
+                       Grid.Column="1"
+                       HorizontalAlignment="Center">
+                <DataGrid x:Name="NamesDataGrid"
+                          ItemsSource="{Binding UsersList.Users}"
+                          AutoGenerateColumns="False"
+                          GridLinesVisibility="All"
+                          FontSize="12"
+                          Margin="5"
+                          HorizontalAlignment="Left"
+                          BorderThickness="0"
+                          DockPanel.Dock="Bottom"
+                          CanUserAddRows="False"
+                          VerticalScrollBarVisibility="Visible"
+                          MaxHeight="365">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="{x:Type DataGridRow}"
+                               BasedOn="{StaticResource MetroDataGridRow}">
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                        <Grid Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Name}"
+                                            ClipboardContentBinding="{x:Null}"
+                                            Header="Name"
+                                            IsReadOnly="True"
+                                            CanUserReorder="True" />
+                        <DataGridTextColumn Binding="{Binding ID}"
+                                            ClipboardContentBinding="{x:Null}"
+                                            Header="User ID"
+                                            IsReadOnly="True"
+                                            CanUserReorder="False" />
+                        <DataGridCheckBoxColumn Binding="{Binding Valid}"
+                                                ElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                                EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
+                                                ClipboardContentBinding="{x:Null}"
+                                                Header="Valid Name"
+                                                IsReadOnly="True" />
+                        <DataGridTemplateColumn x:Name="DeleteButtonColumn">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button x:Name="DeleteNameButton"
+                                            Background="{x:Null}"
+                                            DataContext="{StaticResource UserListViewModel}"
+                                            Command="{WPFControls:BindTo RemoveUser()}">
+                                        <Rectangle x:Name="DeleteNameIconRect"
+                                                   Width="10"
+                                                   Height="10">
+                                            <Rectangle.OpacityMask>
+                                                <VisualBrush x:Name="DeleteNameIcon"
+                                                             Stretch="Fill"
+                                                             Visual="{StaticResource appbar_close}">
+                                                </VisualBrush>
+                                            </Rectangle.OpacityMask>
+                                            <Rectangle.Style>
+                                                <Style TargetType="{x:Type Rectangle}">
+                                                    <Setter Property="Fill"
+                                                            Value="Transparent" />
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                            <Setter Property="Fill"
+                                                                    Value="Red" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="False">
+                                                            <Setter Property="Fill"
+                                                                    Value="#FF5F1212" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Rectangle.Style>
+                                        </Rectangle>
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Name="border"
+                                                                    Background="Transparent"
+                                                                    BorderBrush="Transparent">
+                                                                <ContentPresenter />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="Button.IsPressed"
+                                                                         Value="True">
+                                                                    <Setter TargetName="border"
+                                                                            Property="BorderBrush"
+                                                                            Value="Transparent" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>

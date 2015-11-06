@@ -1,0 +1,128 @@
+﻿<Window x:Class="HelpScoutMetrics.NLogViewer.NLogViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:HelpScoutMetrics.NLogViewer"
+             mc:Ignorable="d"
+             Height="400"
+             Width="600">
+    <Window.DataContext>
+        <local:LogViewerViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.15*" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                        Margin="5">
+                <TextBlock Text="Filter Logs: "
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="14" />
+                <CheckBox Content="Debug"
+                          IsChecked="{Binding ViewDebugLogs}"
+                          Margin="5,0"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" 
+                          IsEnabled="{Binding CheckboxesEnabled}" />
+                <CheckBox Content="Info"
+                          IsChecked="{Binding ViewInfoLogs}"
+                          Margin="5,0"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          IsEnabled="{Binding CheckboxesEnabled}" />
+                <CheckBox Content="Error"
+                          IsChecked="{Binding ViewErrorLogs}"
+                          Margin="5,0"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          IsEnabled="{Binding CheckboxesEnabled}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <TextBlock Text="API Calls:"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="14" />
+                <StackPanel Margin="10,5"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="2,0">
+                        <TextBlock Text="Total:" />
+                        <TextBlock Margin="2,0"
+                                   Text="{Binding CallRecords.TotalAPICalls}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="2,0">
+                        <TextBlock Text="Last 60 Seconds:" />
+                        <TextBlock Margin="2,0"
+                                   Text="{Binding CallRecords.Last60SecondsAPICalls}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+        </StackPanel>
+
+        <ListView x:Name="LogListView"
+                  ItemsSource="{Binding LogEvents}"
+                  Grid.Row="1">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ToolTip"
+                            Value="{Binding ToolTip}" />
+                    <Setter Property="Background"
+                            Value="{Binding Background}" />
+                    <Setter Property="Foreground"
+                            Value="{Binding Foreground}" />
+                    <Setter Property="BorderBrush"
+                            Value="LightGray" />
+                    <Setter Property="BorderThickness"
+                            Value="0,0,0,1" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    Value="DarkOrange" />
+                            <Setter Property="Foreground"
+                                    Value="black" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    Value="{Binding BackgroundMouseOver}" />
+                            <Setter Property="Foreground"
+                                    Value="{Binding ForegroundMouseOver}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding TimeStamp}"
+                                    Header="Time" />
+                    <GridViewColumn DisplayMemberBinding="{Binding Level}"
+                                    Header="Level"
+                                    Width="50">
+                    </GridViewColumn>
+                    <GridViewColumn Header="Message">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="{Binding LogMessage}" 
+                                           MinWidth="250"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Exception}"
+                                    Header="Exception" />
+                </GridView>
+            </ListView.View>
+        </ListView>            
+    </Grid>
+</Window>

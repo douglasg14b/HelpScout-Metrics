@@ -1,0 +1,126 @@
+﻿<UserControl x:Class="HelpScoutMetrics.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:WPFControls="clr-namespace:WpfControls"
+             Controls:ButtonHelper.PreserveTextCase="True"
+             mc:Ignorable="d"
+             Height="201"
+             Width="461"
+             DataContext="{StaticResource SettingsViewModel}"
+             Margin="0,25,0,0">
+
+    <StackPanel Margin="0,0,55,0">
+        <TextBlock HorizontalAlignment="Left"
+                   FontSize="20"
+                   Margin="20,5,5,5">
+                        Settings
+        </TextBlock>
+        <Separator Margin="3,2" />
+        <DockPanel>
+            <Grid DockPanel.Dock="Top"
+                  Margin="0,5"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+                <TextBlock FontSize="14"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Margin="5">
+                    API Key:
+                </TextBlock>
+                <TextBox Grid.Column="1"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Margin="5"
+                         MinWidth="175"
+                         Text="{Binding APIKey, UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Row="1"
+                          Margin="5"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Left"
+                          FontSize="14"
+                          IsChecked="{Binding SaveAPIKey}"
+                          IsEnabled="False"
+                          Grid.Column="1">
+                    Save API Key
+                </CheckBox>
+                <Button Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="5"
+                        Command="{WPFControls:BindTo VerifyAPIKey()}"
+                        Content="{Binding KeyValidationButtonText}"
+                        Foreground="#FF222222"
+                        Background="{Binding VerifyButtonBackground}" />
+
+                <TextBlock Grid.Row="2"
+                           Margin="5"
+                           FontSize="14"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center">
+                    API Throttle:
+                </TextBlock>
+                <DockPanel Grid.Row="2"
+                           Grid.Column="1">
+                    <Slider Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="5"
+                            VerticalAlignment="Center"
+                            Maximum="250"
+                            Minimum="1"
+                            SmallChange="1"
+                            TickPlacement="BottomRight"
+                            TickFrequency="50"
+                            LargeChange="10"
+                            Value="{Binding APICallLimit}"
+                            AutoToolTipPlacement="TopLeft"
+                            MinWidth="150"
+                            ToolTip="The number of API calls to make per minute." />
+                    <TextBlock Margin="0"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               DockPanel.Dock="Right"
+                               Text="{Binding APICallLimit}" />
+                </DockPanel>
+              
+            </Grid>
+            <DockPanel DockPanel.Dock="Bottom"
+                       Margin="0,5">
+                <Button HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="5"
+                        Command="{WPFControls:BindTo ResetSettings()}">
+                    Reset
+                </Button>
+                <Button VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Margin="5"
+                        DockPanel.Dock="Right"
+                        Command="{WPFControls:BindTo SaveSettings()}">
+                    Save And Close
+                </Button>
+                <Button HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Margin="5"
+                        DockPanel.Dock="Right"
+                        Command="{WPFControls:BindTo CloseFlyout()}">
+                    Close And Cancel
+                </Button>
+            </DockPanel>
+        </DockPanel>
+    </StackPanel>
+</UserControl>
