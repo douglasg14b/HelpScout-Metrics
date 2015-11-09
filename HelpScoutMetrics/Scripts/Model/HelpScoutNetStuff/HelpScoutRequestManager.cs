@@ -17,6 +17,7 @@ using System.Collections;
 using HelpScoutNet.Model.Report.User;
 using HelpScoutNet.Request.Report;
 using HelpScoutNet.Model.Report.Team;
+using HelpScoutNet.Model.Report;
 // Used to manage HelpScout API requests to throttle and retry when necessary
 namespace HelpScoutMetrics.Model
 {
@@ -135,7 +136,7 @@ namespace HelpScoutMetrics.Model
                 switch (requestType)
                 {
                     case APICallType.ListUsers:
-                        ListUsers((BaseApiRequest<Paged<HelpScoutNet.Model.User>>)request); //Not Called
+                        ListUsers((BaseApiRequest<Paged<HelpScoutNet.Model.User>>)request); 
                         break;
                     case APICallType.UserReport:
                         GetUserReport((ParameterAPIRequest<UserReport, UserRequest>)request);
@@ -149,8 +150,11 @@ namespace HelpScoutMetrics.Model
                     case APICallType.TeamOverall:
                         GetTeamOverallReport((ParameterAPIRequest<TeamReport, CompareRequest>)request);
                         break;
+                    case APICallType.UserRatings:
+                        GetUserRatings((ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>,UserRatingsRequest>)request);
+                        break;
                     default:
-                        logger.Log(LogLevel.Error, "No matches found for api request"); // Not called
+                        logger.Log(LogLevel.Error, "No matches found for api request"); 
                         break;
                 }
             }
@@ -201,6 +205,15 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved User Happiness");
         }
 
+        public static void GetUserRatings(ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest> request)
+        {
+            logger.Log(LogLevel.Debug, "Attempting To Retrieve User Ratings");
+            Task<PagedReport<HelpScoutNet.Model.Report.Common.Rating>> task = new Task<PagedReport<HelpScoutNet.Model.Report.Common.Rating>>(() => client.GetUserRatings(request.RequestArgs));
+            task.Start();
+            request.SetResult(task.Result);
+            logger.Log(LogLevel.Debug, "Sucessfully Retrieved User Ratings");
+        }
+
         private static void GetTeamOverallReport(ParameterAPIRequest<TeamReport, CompareRequest> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Retrieve Team Overall Report");
@@ -228,6 +241,7 @@ namespace HelpScoutMetrics.Model
         UserReport,
         ListUsers,
         UserHappiness,
+        UserRatings,
         VerifyAPI,
         TeamOverall
     }
