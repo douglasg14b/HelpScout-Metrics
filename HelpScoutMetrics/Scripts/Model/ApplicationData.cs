@@ -63,6 +63,13 @@ namespace HelpScoutMetrics.Scripts.Model
             set { m_APICallHistory = value; }
         }
 
+        private static Dictionary<int, List<UserRating>> m_UserRatings = new Dictionary<int, List<UserRating>>();
+        public static Dictionary<int, List<UserRating>> UserRatings
+        {
+            get { return m_UserRatings; }
+            set { m_UserRatings = value; }
+        }
+
         public static string VersionNumber = "0.0.5.4";
 
         public static WindowAndUserControlReferances WindowReferances = new WindowAndUserControlReferances();

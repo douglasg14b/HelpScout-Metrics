@@ -18,6 +18,7 @@ using HelpScoutNet.Model.Report.User;
 using HelpScoutNet.Request.Report;
 using HelpScoutNet.Model.Report.Team;
 using HelpScoutNet.Model.Report;
+using System.Threading;
 // Used to manage HelpScout API requests to throttle and retry when necessary
 namespace HelpScoutMetrics.Model
 {
@@ -31,9 +32,9 @@ namespace HelpScoutMetrics.Model
 
         private static HelpScoutClient client = new HelpScoutClient(ApplicationData.ApplicationSettings.APIKey);
         private static Logger logger = LogManager.GetLogger("HelpScoutRequestManager");
-        static Timer queueLoopTimer = new Timer();
+        static System.Timers.Timer queueLoopTimer = new System.Timers.Timer();
 
-        private static Queue requestQueue = new Queue();
+        private static ConcurrentQueue<BaseAPIRequest> requestQueue = new ConcurrentQueue<BaseAPIRequest>();
         private static ConcurrentQueue<object> circularBufferQueue = new ConcurrentQueue<object>();
 
         /*============================================================
@@ -58,7 +59,7 @@ namespace HelpScoutMetrics.Model
 
         private static void QueueItemUsed()
         {
-            Timer timer = new Timer(60000);
+            System.Timers.Timer timer = new System.Timers.Timer(60000);
             timer.Elapsed += new ElapsedEventHandler(RemoveItemFromCircularBuffer);
             timer.Start();
         }
@@ -71,7 +72,7 @@ namespace HelpScoutMetrics.Model
                 circularBufferQueue.TryDequeue(out disposableResult);
             }
             ApplicationData.APICallHistory.Last60SecondsAPICalls--;
-            Timer timer = source as Timer;
+            System.Timers.Timer timer = source as System.Timers.Timer;
             timer.Stop();
             timer.Dispose();
         }
@@ -81,9 +82,11 @@ namespace HelpScoutMetrics.Model
             client = new HelpScoutClient(key);
         }
 
+        //Removes all items from the queue
         public static void CancelAllRequests()
         {
-            requestQueue.Clear();
+            //Necessary to facuilitate clearing a concurrentqueue which doe snot support an atomic way of clearing like .clear()
+            Interlocked.Exchange<ConcurrentQueue<BaseAPIRequest>>(ref requestQueue, new ConcurrentQueue<BaseAPIRequest>());
         }
 
         /*============================================================
@@ -109,17 +112,21 @@ namespace HelpScoutMetrics.Model
             {
                 if (requestQueue.Count > 0 && circularBufferQueue.Count < ApplicationData.ApplicationSettings.APIThrottleCount)
                 {
-                    //DetermineAPICall(requestQueue.Dequeue());
-                    Task.Run(() => DetermineAPICall(requestQueue.Dequeue()));
-                    circularBufferQueue.Enqueue(1);
+                    BaseAPIRequest dequeuedRequest;
+                    if (requestQueue.TryDequeue(out dequeuedRequest))
+                    {
+                        Task.Run(() => DetermineAPICall(dequeuedRequest));
+                        circularBufferQueue.Enqueue(1);
 
-                    ApplicationData.APICallHistory.Last60SecondsAPICalls++;
-                    ApplicationData.APICallHistory.TotalAPICalls++;
-                    ApplicationData.APICallHistory.CurrentAPIQueueSize--;
+                        ApplicationData.APICallHistory.Last60SecondsAPICalls++;
+                        ApplicationData.APICallHistory.TotalAPICalls++;
+                        ApplicationData.APICallHistory.CurrentAPIQueueSize--;
 
-                    QueueItemUsed();
+                        QueueItemUsed();
+                    }
                 }
             }
+            ApplicationData.APICallHistory.TotalQueueIterations++;
         }
 
         /*============================================================
@@ -152,6 +159,9 @@ namespace HelpScoutMetrics.Model
                         break;
                     case APICallType.UserRatings:
                         GetUserRatings((ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>,UserRatingsRequest>)request);
+                        break;
+                    case APICallType.GetConversation:
+                        GetConversation((ParameterAPIRequest<Conversation, int>)request);
                         break;
                     default:
                         logger.Log(LogLevel.Error, "No matches found for api request"); 
@@ -223,6 +233,16 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved Team Overall");
         }
 
+        private static void GetConversation(ParameterAPIRequest<Conversation, int> request)
+        {
+            logger.Log(LogLevel.Debug, "Attempting To Retrieve Conversation: " + request.RequestArgs);
+            Task<Conversation> task = new Task<Conversation>(() => client.GetConversation(request.RequestArgs));
+            task.Start();
+            request.SetResult(task.Result);
+            logger.Log(LogLevel.Debug, "Sucessfully Retrieved Conversation: " + request.RequestArgs);
+
+        }
+
         public static void VeryAPI(ParameterAPIRequest<Paged<Mailbox>,string> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Verify API Key");
@@ -243,6 +263,7 @@ namespace HelpScoutMetrics.Model
         UserHappiness,
         UserRatings,
         VerifyAPI,
+        GetConversation,
         TeamOverall
     }
 }

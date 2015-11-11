@@ -160,7 +160,7 @@
                                Text="{Binding TeamTotalUsers}" />
                 </Grid>
             </GroupBox>
-            <TextBlock Text="{Binding APICallCount.Last60SecondsAPICalls}"
+            <TextBlock Text="{Binding APICallCount.TotalQueueIterations}"
                        FontSize="14" />
         </StackPanel>
         <GroupBox DockPanel.Dock="Right"

@@ -16,6 +16,7 @@ using NLog;
 using HelpScoutMetrics.Scripts.Model;
 using HelpScoutMetrics.Scripts.Model.WindowLogic;
 using System.Windows.Data;
+using HelpScoutMetrics.Model;
 
 namespace HelpScoutMetrics.ViewModel
 {
@@ -476,6 +477,7 @@ namespace HelpScoutMetrics.ViewModel
 
         public async void GetQuickStats()
         {
+            StartupDebugMethods.RunMethods(); //Temp for debugging
             CurrentlyLoadingQuickStats = true;
             foreach(HelpScoutMetrics.Model.DataTypes.User userObject in ApplicationData.Users.Users)
             {
@@ -554,7 +556,7 @@ namespace HelpScoutMetrics.ViewModel
 
         public void RefreshView()// Temp for debug of issues
         {
-            foreach (string name in MiscMethods.GetPropertyNames(this))
+            foreach (string name in Model.MiscMethods.GetPropertyNames(this))
             {
                 RaisePropertyChanged(name);
             }

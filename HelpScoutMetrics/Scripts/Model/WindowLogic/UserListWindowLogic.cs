@@ -31,7 +31,7 @@ namespace HelpScoutMetrics.Model.WindowLogic
         //Adds a new call to the API queue to get the users list
         public static void GetHelpScoutUserList(UserListViewModel viewModel)
         {
-            userListCallbackHandler = new ViewModelUserListCallback(viewModel.RecieveHelpScoutUserList);
+            userListCallbackHandler = new ViewModelUserListCallback(viewModel.RecieveHelpScoutUserList); //Sets teh delegate for the viewmodel callback
             BaseApiRequest<Paged<HelpScoutNet.Model.User>> apiRequest = new BaseApiRequest<Paged<HelpScoutNet.Model.User>>(APICallType.ListUsers);
             apiRequest.ResultReady += AcceptHelpScoutUserList;
             apiRequest.resultsFailedHandler = new BaseAPIRequest.ResultsFailed(viewModel.FailedToRetrieveHelpScoutUsersList);

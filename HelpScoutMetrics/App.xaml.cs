@@ -38,7 +38,8 @@ namespace HelpScoutMetrics
             mainWindow.Show();
 
             //Task.Run(new Action(() => AddLoggerEntries(5000)));
-            
+
+
         }
 
         private void AddLoggerEntries(int count)

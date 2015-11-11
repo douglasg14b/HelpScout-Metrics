@@ -31,6 +31,13 @@ namespace HelpScoutMetrics.Model.DataTypes
             set { m_CurrentAPIQueueSize = value; RaisePropertyChanged("CurrentAPIQueueSize"); }
         }
 
+        private int m_TotalQueueIterations = 0;
+        public int TotalQueueIterations
+        {
+            get { return m_TotalQueueIterations; }
+            set { m_TotalQueueIterations = value; RaisePropertyChanged("TotalQueueIterations"); }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void RaisePropertyChanged(String propertyName)
         {

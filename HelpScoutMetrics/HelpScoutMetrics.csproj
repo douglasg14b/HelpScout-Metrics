@@ -53,6 +53,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>packages\CsvHelper.2.13.2.0\lib\net40-client\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -180,6 +184,7 @@
     <Compile Include="Scripts\Model\DataTypes\TeamTotals.cs" />
     <Compile Include="Scripts\Model\DataTypes\User.cs" />
     <Compile Include="Scripts\Model\DataTypes\UserList.cs" />
+    <Compile Include="Scripts\Model\DataTypes\UserRating.cs" />
     <Compile Include="Scripts\Model\DataTypes\WindowAndUserControlReferances.cs" />
     <Compile Include="Scripts\Model\HelpScoutNetStuff\BaseAPIRequest.cs" />
     <Compile Include="Scripts\Model\HelpScoutNetStuff\HelpScoutRequestManager.cs" />
@@ -189,6 +194,7 @@
     <Compile Include="Scripts\Model\Saving And Loading\LoadData.cs" />
     <Compile Include="Scripts\Model\Saving And Loading\SaveData.cs" />
     <Compile Include="Scripts\Model\Settings\UserInterfacePreferances.cs" />
+    <Compile Include="Scripts\Model\StartupDebugMethods.cs" />
     <Compile Include="Scripts\Model\WindowLogic\MainWindowLogic.cs" />
     <Compile Include="Scripts\Model\DataTypes\QuickStats.cs" />
     <Compile Include="Scripts\Model\Settings\Settings.cs" />
