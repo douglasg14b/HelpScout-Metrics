@@ -38,6 +38,13 @@ namespace HelpScoutMetrics.Model.DataTypes
             set { m_TotalQueueIterations = value; RaisePropertyChanged("TotalQueueIterations"); }
         }
 
+        private long m_LastFrameTime;
+        public long LastFrameTime
+        {
+            get { return m_LastFrameTime; }
+            set { m_LastFrameTime = value; RaisePropertyChanged("LastFrameTime"); }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void RaisePropertyChanged(String propertyName)
         {

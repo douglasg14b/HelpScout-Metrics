@@ -60,7 +60,7 @@ namespace HelpScoutMetrics
 
         protected override void OnExit(ExitEventArgs e)
         {
-            SaveDataType dataToSave = new SaveDataType(ApplicationData.ApplicationSettings, ApplicationData.ApplicationColumns, ApplicationData.Users);
+            SaveDataType dataToSave = new SaveDataType(ApplicationData.ApplicationSettings, ApplicationData.ApplicationColumns, ApplicationData.Users, ApplicationData.UserRatingsList);
             SaveData.SaveAllData(dataToSave);
             base.OnExit(e);
         }

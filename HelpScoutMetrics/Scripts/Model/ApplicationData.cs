@@ -70,6 +70,13 @@ namespace HelpScoutMetrics.Scripts.Model
             set { m_UserRatings = value; }
         }
 
+        private static List<UserRating> m_UserRatingsList = new List<UserRating>();
+        public static List<UserRating> UserRatingsList
+        {
+            get { return m_UserRatingsList; }
+            set { m_UserRatingsList = value; }
+        }
+
         public static string VersionNumber = "0.0.5.4";
 
         public static WindowAndUserControlReferances WindowReferances = new WindowAndUserControlReferances();

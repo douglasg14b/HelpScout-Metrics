@@ -15,16 +15,18 @@ namespace HelpScoutMetrics.Model.DataTypes
         {
             UserID = userID;
             UserName = user;
-            Rating = rating;
+            ConvertRating(rating);
             CustomerID = customerID;
             CustomerName = customerName;
             ConversationID = conversationID;
             ConversationNumber = conversationNumber;
             RatingTime = ratingTime;
-            RatingComment = comment;
+            Comments = comment;
 
             ConversationURL = "https://secure.helpscout.net/conversation/" + ConversationID + "/" + ConversationNumber;
         }
+
+        public UserRating() { }
 
 
         public int UserID { get; set; }
@@ -40,30 +42,48 @@ namespace HelpScoutMetrics.Model.DataTypes
         public int ConversationID { get; set; }
         public int ConversationNumber { get; set; }
         public DateTime RatingTime { get; set; }
-        public string RatingComment { get; set; }
+        public string Comments { get; set; }
 
         public string ConversationURL { get; set; }
 
         //Temp fields, not dynamic TODO: Remove/Fix
-        public Company WhichCompany { get; set; }
+        public Company FCRorDoorDash { get; set; }
         public enum Company
         {
             FCR,
             DoorDash
         }
 
-        public string Tags { get; set; }
+        //public string Tags { get; set; }
+        public List<string> Tags { get; set; }
 
-        public void AddTags(List<string> tags)
+        //public void AddTags(List<string> tags)
+        //{
+        //    string concatenatedTags = "";
+        //    for(int i = 0; i < tags.Count; i++)
+        //    {
+        //        concatenatedTags = concatenatedTags + tags[i] + ", ";
+        //        if (i == tags.Count - 1)
+        //        {
+        //            concatenatedTags = concatenatedTags + tags[i];
+        //        }
+        //    }
+        //    Tags = concatenatedTags;
+        //}
+
+        public void ConvertRating(int rating)
         {
-            string concatenatedTags = "";
-            for(int i = 0; i < tags.Count; i++)
+            switch(rating)
             {
-                concatenatedTags = concatenatedTags + tags[i] + ", ";
-                if (i == tags.Count - 1)
-                {
-                    concatenatedTags = concatenatedTags + tags[i];
-                }
+                case 1:
+                    Rating = 1;
+                    break;
+                case 2:
+                    rating = 0;
+                    break;
+                case 3:
+                    rating = -1;
+                    break;
             }
         }
     }

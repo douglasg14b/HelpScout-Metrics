@@ -8,20 +8,38 @@ using HelpScoutNet.Request.Report.User;
 using HelpScoutNet.Model.Report;
 using HelpScoutNet.Model.Report.Common;
 using HelpScoutMetrics.Scripts.Model.DataTypes;
-using CsvHelper;
 using System.IO;
 using HelpScoutMetrics.Scripts.Model;
 using HelpScoutNet.Model;
 using NLog;
 using HelpScoutMetrics.Model.DataTypes;
+using CSVSerialization;
 
+//Hacked together class, need to takes it behavior and refine it and integrate it into the rest of the application
 namespace HelpScoutMetrics.Model
 {
     public static class StartupDebugMethods
     {
         public static void RunMethods()
         {
-            GetUserList();
+            //GetUserList();
+            //TestMethod();
+            //WriteToCSV(ApplicationData.UserRatings);
+        }
+
+        private static void TestMethod()
+        {
+            for(int i = 0; i < 1000; i++)
+            {
+                ParameterAPIRequest<SingleItem<Conversation>, int> request = new ParameterAPIRequest<SingleItem<Conversation>, int>(137861007, APICallType.GetConversation);
+                request.ResultReady += TestRecieveMethod;
+                HelpScoutRequestManager.NewQueueItem(request);
+            }
+        }
+
+        private static void TestRecieveMethod(object sender, BaseApiRequest<SingleItem<Conversation>>.ResultReadyEventArgs<SingleItem<Conversation>> e)
+        {
+
         }
 
         static Logger logger = LogManager.GetLogger("StartupDebug");
@@ -60,8 +78,8 @@ namespace HelpScoutMetrics.Model
                 }
                 else
                 {
-                    WriteToCSV(ApplicationData.UserRatings);
-                    //QueueGetConversations();
+                    //WriteToCSV(ApplicationData.UserRatings);
+                    QueueGetConversations();
                 }
             }
         }
@@ -69,6 +87,7 @@ namespace HelpScoutMetrics.Model
         //Gets users list to pull all user ID's for comparison
         private static void GetUserList()
         {
+
             BaseApiRequest<Paged<HelpScoutNet.Model.User>> request = new BaseApiRequest<Paged<HelpScoutNet.Model.User>>(APICallType.ListUsers);
             request.ResultReady += RecieveUserList;
             HelpScoutRequestManager.NewQueueItem(request);
@@ -87,9 +106,9 @@ namespace HelpScoutMetrics.Model
         {
             DateTime start = new DateTime(2015, 9, 1, 0, 0, 0, DateTimeKind.Local);
             DateTime end = new DateTime(2015, 10, 31, 23, 59, 59, DateTimeKind.Local);
-            for(int i = 1; i <= pagecount; i++)
+            for (int i = 1; i <= pagecount; i++)
             {
-                ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest> request = new ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest>(new UserRatingsRequest(userID, start.ToUniversalTime(), end.ToUniversalTime(), Ratings.All) { Page = i}, APICallType.UserRatings);
+                ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest> request = new ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest>(new UserRatingsRequest(userID, start.ToUniversalTime(), end.ToUniversalTime(), Ratings.All) { Page = i }, APICallType.UserRatings);
                 request.ResultReady += RecieveRatingsResults;
                 HelpScoutRequestManager.NewQueueItem(request);
             }
@@ -102,7 +121,7 @@ namespace HelpScoutMetrics.Model
             {
                 UserRating.Company whichCompany;
 
-                if (FCRUserIDs.Contains(rate.RatingUserID))
+                if (UserIDs.Contains(rate.RatingUserID))
                 {
                     whichCompany = UserRating.Company.FCR;
                 }
@@ -113,7 +132,7 @@ namespace HelpScoutMetrics.Model
 
                 UserRating userRating = new UserRating(rate.RatingUserID, rate.RatingUserName, rate.RatingID, rate.RatingCustomerID, rate.RatingCustomerName, rate.ID, rate.Number, rate.RatingCreatedAt.GetValueOrDefault(), rate.RatingComments)
                 {
-                    WhichCompany = whichCompany
+                    FCRorDoorDash = whichCompany
                 };
 
                 //Necessary since multiple ratings can come from a single conversation. 
@@ -136,8 +155,8 @@ namespace HelpScoutMetrics.Model
                 }
                 else
                 {
-                    WriteToCSV(ApplicationData.UserRatings);
-                    //QueueGetConversations();
+                    //WriteToCSV(ApplicationData.UserRatings);
+                    QueueGetConversations();
                 }
             }
         }
@@ -150,45 +169,75 @@ namespace HelpScoutMetrics.Model
 
         private static void QueueGetConversations()
         {
-            foreach(List<UserRating> ratingList in ApplicationData.UserRatings.Values)
+            for(int i = 0; i < ApplicationData.UserRatings.Count;  i++)
             {
-                foreach(UserRating rating in ratingList)
+                if(i == ApplicationData.UserRatings.Count - 1)
                 {
-                    GetConversation(rating.ConversationID);
+                    for(int ii = 0; ii < ApplicationData.UserRatings.ElementAt(i).Value.Count; ii++)
+                    {
+                        if(ii == ApplicationData.UserRatings.ElementAt(i).Value.Count - 1)
+                        {
+                            GetFinalConversation(ApplicationData.UserRatings.ElementAt(i).Value[ii].ConversationID);
+                        }
+                        else
+                        {
+                            GetConversation(ApplicationData.UserRatings.ElementAt(i).Value[ii].ConversationID);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (UserRating rating in ApplicationData.UserRatings.ElementAt(i).Value)
+                    {
+                        GetConversation(rating.ConversationID);
+                    }
                 }
             }
         }
 
         private static void GetConversation(int ID)
         {
-            ParameterAPIRequest<Conversation, int> request = new ParameterAPIRequest<Conversation, int>(ID, APICallType.GetConversation);
+            ParameterAPIRequest<SingleItem<Conversation>, int> request = new ParameterAPIRequest<SingleItem<Conversation>, int>(ID, APICallType.GetConversation);
             request.ResultReady += RecieveConversation;
             HelpScoutRequestManager.NewQueueItem(request);
         }
 
-        private static void RecieveConversation(object sender, BaseApiRequest<Conversation>.ResultReadyEventArgs<Conversation> e)
+        private static void GetFinalConversation(int ID)
         {
-            if (e.Result.Tags != null)
+            ParameterAPIRequest<SingleItem<Conversation>, int> request = new ParameterAPIRequest<SingleItem<Conversation>, int>(ID, APICallType.GetConversation);
+            request.ResultReady += RecieveFinalConversation;
+            HelpScoutRequestManager.NewQueueItem(request);
+        }
+
+        private static void RecieveConversation(object sender, BaseApiRequest<SingleItem<Conversation>>.ResultReadyEventArgs<SingleItem<Conversation>> e)
+        {
+            if (e.Result.Item.Tags != null)
             {
-                if (e.Result.Tags.Count != 0)
+                if (e.Result.Item.Tags.Count != 0)
                 {
-                    AddTagsToReport(e.Result.Id, e.Result.Tags);
+                    AddTagsToReport(e.Result.Item.Id, e.Result.Item.Tags);
                 }
 
                 conversationsRetrieved++;
-
-                if (conversationsRetrieved == ApplicationData.UserRatings.Count)
-                {
-                    WriteToCSV(ApplicationData.UserRatings);
-                }
             }
+
+            if (conversationsRetrieved == ApplicationData.UserRatings.Count)
+            {
+                WriteToCSV(ApplicationData.UserRatings);
+            }
+        }
+
+        private static void RecieveFinalConversation(object sender, BaseApiRequest<SingleItem<Conversation>>.ResultReadyEventArgs<SingleItem<Conversation>> e)
+        {
+            RecieveConversation(sender, e);
+            WriteToCSV(ApplicationData.UserRatings);
         }
 
         private static void AddTagsToReport(int conversationID, List<string> tags)
         {
             foreach(UserRating rating in ApplicationData.UserRatings[conversationID])
             {
-                rating.AddTags(tags);
+                rating.Tags = tags;
             }
         }
 
@@ -196,48 +245,77 @@ namespace HelpScoutMetrics.Model
 
         private static void WriteToCSV(Dictionary<int,List<UserRating>> ratings)
         {
-            using (StreamWriter writer = new StreamWriter("testoutput.csv"))
+            List<UserRating> finalRatings = new List<UserRating>();
+            ApplicationData.UserRatingsList = finalRatings;
+            foreach(List<UserRating> ratingList in ratings.Values)
             {
-                string firstLine = string.Format("{0},{1},{2},{3},{4},{5},{5},{7},{8},{9},{10},{11}",
-                    "Conversation URL",
-                    "Conversation Number",
-                    "Conversation ID",
-                    "Customer ID",
-                    "Customer Name",
-                    "User ID",
-                    "User Name",
-                    "Rating Time",
-                    "Rating",
-                    "Tags",
-                    "FCR Or DoorDash",
-                    "Comments");
-                writer.WriteLine(firstLine);
-                writer.Flush();
-
-                foreach (List<UserRating> ratingList in ratings.Values)
+                foreach(UserRating rating in ratingList)
                 {
-                    foreach(UserRating rating in ratingList)
-                    {
-                        string line = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},\"{11}\"",
-                        rating.ConversationURL,
-                        rating.ConversationNumber,
-                        rating.ConversationID,
-                        rating.CustomerID,
-                        rating.CustomerName,
-                        rating.UserID,
-                        rating.UserName,
-                        rating.RatingTime.ToString(),
-                        rating.Rating,
-                        rating.Tags,
-                        rating.WhichCompany.ToString(),
-                        CleanStringForCSV(rating.RatingComment));
-
-                        writer.WriteLine(line);
-                        writer.Flush();
-                    }                    
+                    finalRatings.Add(rating);
                 }
-                writer.Close();
             }
+            CSVSerializer<UserRating> CSVFormatter = new CSVSerializer<UserRating>();
+
+            List<string> collumnNames = new List<string>()
+            {
+                            "Conversation URL",
+                            "Conversation Number",
+                            "Conversation ID",
+                            "Customer ID",
+                            "Customer Name",
+                            "User ID",
+                            "User Name",
+                            "Rating Time",
+                            "Rating",
+                            "FCR Or DoorDash",
+                            "Comments",
+                            "Tags"
+            };
+
+            CSVFormatter.WriteCSV("testoutput.csv", finalRatings, collumnNames);
+
+            //    using (StreamWriter writer = new StreamWriter("testoutput.csv"))
+            //    {
+            //        string firstLine = string.Format("{0},{1},{2},{3},{4},{5},{5},{7},{8},{9},{10},{11}",
+            //            "Conversation URL",
+            //            "Conversation Number",
+            //            "Conversation ID",
+            //            "Customer ID",
+            //            "Customer Name",
+            //            "User ID",
+            //            "User Name",
+            //            "Rating Time",
+            //            "Rating",
+            //            "FCR Or DoorDash",
+            //            "Comments",
+            //            "Tags");
+            //        writer.WriteLine(firstLine);
+            //        writer.Flush();
+
+            //        foreach (List<UserRating> ratingList in ratings.Values)
+            //        {
+            //            foreach(UserRating rating in ratingList)
+            //            {
+            //                string line = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},\"{11}\"",
+            //                rating.ConversationURL,
+            //                rating.ConversationNumber,
+            //                rating.ConversationID,
+            //                rating.CustomerID,
+            //                rating.CustomerName,
+            //                rating.UserID,
+            //                rating.UserName,
+            //                rating.RatingTime.ToString(),
+            //                rating.Rating,
+            //                rating.WhichCompany.ToString(),
+            //                CleanStringForCSV(rating.RatingComment),
+            //                "\"" + rating.Tags + "\"");
+
+            //                writer.WriteLine(line);
+            //                writer.Flush();
+            //            }                    
+            //        }
+            //        writer.Close();
+            //    }
         }
 
 
@@ -258,7 +336,7 @@ namespace HelpScoutMetrics.Model
         static List<int> allUserIDs = new List<int>();
 
         //Holds just the FCR suer ID's for comparison purposes, not dynamic
-        static List<int> FCRUserIDs = new List<int>()
+        static List<int> UserIDs = new List<int>()
         {
             89080,
             89087,

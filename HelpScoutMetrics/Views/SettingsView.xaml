@@ -80,7 +80,7 @@
                             Grid.Column="1"
                             Margin="5"
                             VerticalAlignment="Center"
-                            Maximum="250"
+                            Maximum="200"
                             Minimum="1"
                             SmallChange="1"
                             TickPlacement="BottomRight"

@@ -53,10 +53,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
-      <HintPath>packages\CsvHelper.2.13.2.0\lib\net40-client\CsvHelper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="MahApps.Metro, Version=1.1.2.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -143,6 +139,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\HappinessView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainScreenView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -193,6 +193,7 @@
     <Compile Include="Scripts\Model\Logging\HelpScoutLogHelpers.cs" />
     <Compile Include="Scripts\Model\Saving And Loading\LoadData.cs" />
     <Compile Include="Scripts\Model\Saving And Loading\SaveData.cs" />
+    <Compile Include="Scripts\Model\Saving And Loading\WriteToCSV.cs" />
     <Compile Include="Scripts\Model\Settings\UserInterfacePreferances.cs" />
     <Compile Include="Scripts\Model\StartupDebugMethods.cs" />
     <Compile Include="Scripts\Model\WindowLogic\MainWindowLogic.cs" />
@@ -211,6 +212,9 @@
     <Compile Include="Scripts\ViewModel\UserListViewModel.cs" />
     <Compile Include="Scripts\ViewModel\ViewModelBase.cs" />
     <Compile Include="Scripts\WPFTextBoxAutoComplete.cs" />
+    <Compile Include="Views\HappinessView.xaml.cs">
+      <DependentUpon>HappinessView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainScreenView.xaml.cs">
       <DependentUpon>MainScreenView.xaml</DependentUpon>
     </Compile>
@@ -264,6 +268,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CSVSerializer\CSVSerializer\CSVSerializer.csproj">
+      <Project>{6afeb346-996c-4821-8317-fb7d0fd06b4b}</Project>
+      <Name>CSVSerializer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\HelpScoutNet\src\HelpScoutNet.csproj">
       <Project>{721decd5-21d0-430e-8623-84fc6311322b}</Project>
       <Name>HelpScoutNet</Name>

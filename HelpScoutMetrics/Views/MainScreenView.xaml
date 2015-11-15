@@ -162,6 +162,8 @@
             </GroupBox>
             <TextBlock Text="{Binding APICallCount.TotalQueueIterations}"
                        FontSize="14" />
+            <TextBlock Text="{Binding APICallCount.LastFrameTime}"
+                       FontSize="14" />
         </StackPanel>
         <GroupBox DockPanel.Dock="Right"
                   VerticalAlignment="Top"
