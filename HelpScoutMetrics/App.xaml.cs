@@ -69,6 +69,8 @@ namespace HelpScoutMetrics
         {
             // put your tracing or logging code here (I put a message box as an example)
             MessageBox.Show(e.ExceptionObject.ToString());
+            SaveDataType dataToSave = new SaveDataType(ApplicationData.ApplicationSettings, ApplicationData.ApplicationColumns, ApplicationData.Users, ApplicationData.UserRatingsList);
+            SaveData.SaveAllData(dataToSave);
         }
 
 

@@ -23,6 +23,8 @@ namespace HelpScoutMetrics.Model.SaveAndLoad
                     ApplicationData.ApplicationColumns = savedData.Columns;
                 if (savedData.UsersList != null)
                     ApplicationData.Users = savedData.UsersList;
+                if (savedData.UserRatings != null)
+                    ApplicationData.UserRatingsList = savedData.UserRatings;
             }
             else
             {

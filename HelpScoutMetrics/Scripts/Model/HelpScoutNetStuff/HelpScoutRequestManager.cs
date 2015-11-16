@@ -122,7 +122,7 @@ namespace HelpScoutMetrics.Model
 
             working = true;
             OnLoop();
-            queueLoopTimer.Change(25, Timeout.Infinite);
+            queueLoopTimer.Change(100, Timeout.Infinite);
         }
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
@@ -179,7 +179,7 @@ namespace HelpScoutMetrics.Model
          *  API Call Methods
          * ==========================================================*/
 
-        private static void DetermineAPICall(object request)
+        private static async void DetermineAPICall(object request)
         {
             dynamic requestCast = (dynamic) request;
             APICallType requestType = requestCast.RequestType;
@@ -189,25 +189,25 @@ namespace HelpScoutMetrics.Model
                 switch (requestType)
                 {
                     case APICallType.ListUsers:
-                        ListUsers((BaseApiRequest<Paged<HelpScoutNet.Model.User>>)request); 
+                        await ListUsers((BaseApiRequest<Paged<HelpScoutNet.Model.User>>)request); 
                         break;
                     case APICallType.UserReport:
-                        GetUserReport((ParameterAPIRequest<UserReport, UserRequest>)request);
+                        await GetUserReport((ParameterAPIRequest<UserReport, UserRequest>)request);
                         break;
                     case APICallType.UserHappiness:
-                        GetUserHappiness((ParameterAPIRequest<UserHappiness, UserRequest>)request);
+                        await GetUserHappiness((ParameterAPIRequest<UserHappiness, UserRequest>)request);
                         break;
                     case APICallType.VerifyAPI:
                         VeryAPI((ParameterAPIRequest<Paged<Mailbox>, string>)request);
                         break;
                     case APICallType.TeamOverall:
-                        GetTeamOverallReport((ParameterAPIRequest<TeamReport, CompareRequest>)request);
+                        await GetTeamOverallReport((ParameterAPIRequest<TeamReport, CompareRequest>)request);
                         break;
                     case APICallType.UserRatings:
-                        GetUserRatings((ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>,UserRatingsRequest>)request);
+                        await GetUserRatings((ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>,UserRatingsRequest>)request);
                         break;
                     case APICallType.GetConversation:
-                        GetConversation((ParameterAPIRequest<SingleItem<Conversation>, int>)request);
+                        await GetConversation((ParameterAPIRequest<SingleItem<Conversation>, int>)request);
                         break;
                     default:
                         logger.Log(LogLevel.Error, "No matches found for api request"); 
@@ -238,7 +238,7 @@ namespace HelpScoutMetrics.Model
             }
         }
 
-        public async static void GetUserReport(ParameterAPIRequest<UserReport, UserRequest> request)
+        public async static Task GetUserReport(ParameterAPIRequest<UserReport, UserRequest> request)
         {
             //Task<UserReport> task = new Task<UserReport>(() => client.GetUserOverallReport(request.RequestArgs));
             //task.Start();
@@ -246,7 +246,7 @@ namespace HelpScoutMetrics.Model
             request.SetResult(results);
         }
 
-        public async static void ListUsers(BaseApiRequest<Paged<HelpScoutNet.Model.User>> request)
+        public async static Task ListUsers(BaseApiRequest<Paged<HelpScoutNet.Model.User>> request)
         {
             //logger.Log(LogLevel.Debug, "Attempting To Retrieve HelpScout Users List");
             //request.SetResult(client.ListUsers());
@@ -255,7 +255,7 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved HelpScout Users List");
         }
 
-        public async static void GetUserHappiness(ParameterAPIRequest<UserHappiness, UserRequest> request)
+        public async static Task GetUserHappiness(ParameterAPIRequest<UserHappiness, UserRequest> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Retrieve User Happiness");
             //Task<UserHappiness> task = new Task<UserHappiness>(() => client.GetUserHappiness(request.RequestArgs));
@@ -265,7 +265,7 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved User Happiness");
         }
 
-        public async static void GetUserRatings(ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest> request)
+        public async static Task GetUserRatings(ParameterAPIRequest<PagedReport<HelpScoutNet.Model.Report.Common.Rating>, UserRatingsRequest> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Retrieve User Ratings");
             //Task<PagedReport<HelpScoutNet.Model.Report.Common.Rating>> task = new Task<PagedReport<HelpScoutNet.Model.Report.Common.Rating>>(() => client.GetUserRatings(request.RequestArgs));
@@ -275,7 +275,7 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved User Ratings");
         }
 
-        private async static void GetTeamOverallReport(ParameterAPIRequest<TeamReport, CompareRequest> request)
+        private async static Task GetTeamOverallReport(ParameterAPIRequest<TeamReport, CompareRequest> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Retrieve Team Overall Report");
             //Task<TeamReport> task = new Task<TeamReport>(() => client.GetTeamOverall(request.RequestArgs));
@@ -285,7 +285,7 @@ namespace HelpScoutMetrics.Model
             logger.Log(LogLevel.Debug, "Sucessfully Retrieved Team Overall");
         }
 
-        private async static void GetConversation(ParameterAPIRequest<SingleItem<Conversation>, int> request)
+        private async static Task GetConversation(ParameterAPIRequest<SingleItem<Conversation>, int> request)
         {
             logger.Log(LogLevel.Debug, "Attempting To Retrieve Conversation: " + request.RequestArgs);
             //Task<Conversation> task = new Task<Conversation>(() => client.GetConversation(request.RequestArgs));

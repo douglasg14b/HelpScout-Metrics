@@ -79,10 +79,10 @@ namespace HelpScoutMetrics.Model.DataTypes
                     Rating = 1;
                     break;
                 case 2:
-                    rating = 0;
+                    Rating = 0;
                     break;
                 case 3:
-                    rating = -1;
+                    Rating = -1;
                     break;
             }
         }

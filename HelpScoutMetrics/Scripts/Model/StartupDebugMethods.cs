@@ -39,7 +39,6 @@ namespace HelpScoutMetrics.Model
 
         private static void TestRecieveMethod(object sender, BaseApiRequest<SingleItem<Conversation>>.ResultReadyEventArgs<SingleItem<Conversation>> e)
         {
-
         }
 
         static Logger logger = LogManager.GetLogger("StartupDebug");
@@ -246,14 +245,22 @@ namespace HelpScoutMetrics.Model
         private static void WriteToCSV(Dictionary<int,List<UserRating>> ratings)
         {
             List<UserRating> finalRatings = new List<UserRating>();
-            ApplicationData.UserRatingsList = finalRatings;
-            foreach(List<UserRating> ratingList in ratings.Values)
+            if (ApplicationData.UserRatingsList.Count == 0)
             {
-                foreach(UserRating rating in ratingList)
+                foreach (List<UserRating> ratingList in ratings.Values)
                 {
-                    finalRatings.Add(rating);
+                    foreach (UserRating rating in ratingList)
+                    {
+                        finalRatings.Add(rating);
+                    }
                 }
+                ApplicationData.UserRatingsList = finalRatings;
             }
+            else
+            {
+                finalRatings = ApplicationData.UserRatingsList;
+            }
+
             CSVSerializer<UserRating> CSVFormatter = new CSVSerializer<UserRating>();
 
             List<string> collumnNames = new List<string>()
