@@ -477,7 +477,6 @@ namespace HelpScoutMetrics.ViewModel
 
         public async void GetQuickStats()
         {
-            StartupDebugMethods.RunMethods(); //Temp for debugging
             CurrentlyLoadingQuickStats = true;
             foreach(HelpScoutMetrics.Model.DataTypes.User userObject in ApplicationData.Users.Users)
             {
