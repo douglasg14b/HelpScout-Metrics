@@ -195,7 +195,6 @@
     <Compile Include="Scripts\Model\Saving And Loading\SaveData.cs" />
     <Compile Include="Scripts\Model\Saving And Loading\WriteToCSV.cs" />
     <Compile Include="Scripts\Model\Settings\UserInterfacePreferances.cs" />
-    <Compile Include="Scripts\Model\StartupDebugMethods.cs" />
     <Compile Include="Scripts\Model\WindowLogic\MainWindowLogic.cs" />
     <Compile Include="Scripts\Model\DataTypes\QuickStats.cs" />
     <Compile Include="Scripts\Model\Settings\Settings.cs" />
